@@ -403,23 +403,25 @@ export const Part = z
   })
 export type Part = z.infer<typeof Part>
 
+export const AssistantError = z
+  .discriminatedUnion("name", [
+    AuthError.Schema,
+    NamedError.Unknown.Schema,
+    OutputLengthError.Schema,
+    AbortedError.Schema,
+    StructuredOutputError.Schema,
+    ContextOverflowError.Schema,
+    APIError.Schema,
+  ])
+  .optional()
+
 export const Assistant = Base.extend({
   role: z.literal("assistant"),
   time: z.object({
     created: z.number(),
     completed: z.number().optional(),
   }),
-  error: z
-    .discriminatedUnion("name", [
-      AuthError.Schema,
-      NamedError.Unknown.Schema,
-      OutputLengthError.Schema,
-      AbortedError.Schema,
-      StructuredOutputError.Schema,
-      ContextOverflowError.Schema,
-      APIError.Schema,
-    ])
-    .optional(),
+  error: AssistantError,
   parentID: MessageID.zod,
   modelID: ModelID.zod,
   providerID: ProviderID.zod,
